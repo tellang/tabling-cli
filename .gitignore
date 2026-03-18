@@ -5,3 +5,12 @@ dist/
 *.egg-info/
 .env
 .mypy_cache/
+
+# AI 에이전트 지시 파일 (원칙 7: Skill Files)
+CLAUDE.md
+GEMINI.md
+AGENTS.md
+SKILL.md
+
+# 이슈/작업 트래킹 디렉토리
+docs/issues/
