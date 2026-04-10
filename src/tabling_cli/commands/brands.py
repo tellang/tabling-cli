@@ -71,6 +71,9 @@ def list_brands(
 
     async def _run() -> dict:
         try:
+            if parsed_params:
+                # 원칙 2: --params 쿼리 파라미터 오버라이드
+                return await client._request("GET", "/v1/brands/", params=parsed_params)
             return await client.get_brands(page=page, size=page_size)
         finally:
             await client.close()

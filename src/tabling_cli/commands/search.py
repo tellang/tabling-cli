@@ -184,7 +184,14 @@ def search(
             if parsed_body is not None:
                 # 원칙 2: json_body 직접 전달
                 return await client._request(
-                    "POST", "/v1/search/restaurants/map", json=parsed_body
+                    "POST", "/v1/search/restaurants/map",
+                    json=parsed_body, params=parsed_params or {},
+                )
+            if parsed_params:
+                # 원칙 2: --params 쿼리 파라미터 오버라이드
+                return await client._request(
+                    "POST", "/v1/search/restaurants/map",
+                    json=request_body, params=parsed_params,
                 )
             return await client.search(
                 keyword=keyword,

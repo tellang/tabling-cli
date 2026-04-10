@@ -30,6 +30,12 @@ _COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
     "search": {
         "command": "tabling search",
         "description": "테이블링 매장 검색",
+        "examples": [
+            "tabling search \"스시\"",
+            "tabling search \"카페\" --area pangyo --radius 2.0",
+            "tabling search --lat 37.394 --lng 127.111 --fields restaurantName,rating",
+            "tabling search --json-body '{\"keyword\":\"맛집\",\"page\":1,\"pageSize\":5}'",
+        ],
         "parameters": {
             "keyword": {"type": "string", "description": "검색 키워드", "required": False, "default": ""},
             "page": {"type": "integer", "description": "페이지 번호", "required": False, "default": 1, "min": 1},
@@ -59,6 +65,11 @@ _COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
     "shop info": {
         "command": "tabling shop info",
         "description": "매장 상세 정보 조회",
+        "examples": [
+            "tabling shop info 12345",
+            "tabling shop info 12345 --fields name,rating,address",
+            "tabling shop info 12345 --dry-run",
+        ],
         "parameters": {
             "shop_id": {"type": "string", "description": "매장 ID", "required": True},
             "format": {"type": "string", "description": "출력 형식", "required": False, "default": "json", "enum": ["json", "table", "compact"]},
@@ -77,6 +88,9 @@ _COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
     "waitlist register": {
         "command": "tabling waitlist register",
         "description": "대기열 등록 (placeholder)",
+        "examples": [
+            "tabling waitlist register 12345 --party-size 4 --dry-run",
+        ],
         "parameters": {
             "shop_id": {"type": "string", "description": "매장 ID", "required": True},
             "party_size": {"type": "integer", "description": "인원수", "required": False, "default": 2},
@@ -94,6 +108,9 @@ _COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
     "waitlist cancel": {
         "command": "tabling waitlist cancel",
         "description": "대기열 취소 (placeholder)",
+        "examples": [
+            "tabling waitlist cancel W123 --dry-run",
+        ],
         "parameters": {
             "waitlist_id": {"type": "string", "description": "대기열 ID", "required": True},
             "format": {"type": "string", "description": "출력 형식", "required": False, "default": "json", "enum": ["json", "table", "compact"]},
@@ -109,6 +126,10 @@ _COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
     "waitlist info": {
         "command": "tabling waitlist info",
         "description": "매장의 대기/원격대기 상태 조회",
+        "examples": [
+            "tabling waitlist info 12345",
+            "tabling waitlist info 12345 --fields useWaiting,waitingCount",
+        ],
         "parameters": {
             "shop_id": {"type": "string", "description": "매장 ID", "required": True},
             "format": {"type": "string", "description": "출력 형식", "required": False, "default": "json", "enum": ["json", "table", "compact"]},
@@ -125,6 +146,10 @@ _COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
     "curations list": {
         "command": "tabling curations list",
         "description": "큐레이션 목록 조회",
+        "examples": [
+            "tabling curations list --home",
+            "tabling curations list --all --fields title,restaurantIdxes",
+        ],
         "parameters": {
             "home": {"type": "boolean", "description": "홈 큐레이션만 조회 여부", "required": False, "default": True},
             "format": {"type": "string", "description": "출력 형식", "required": False, "default": "json", "enum": ["json", "table", "compact"]},
@@ -141,6 +166,10 @@ _COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
     "curations restaurants": {
         "command": "tabling curations restaurants",
         "description": "큐레이션 내 매장 목록 조회",
+        "examples": [
+            "tabling curations restaurants abc123",
+            "tabling curations restaurants abc123 --limit 10 --fields restaurantName,rating",
+        ],
         "parameters": {
             "curation_id": {"type": "string", "description": "큐레이션 ID", "required": True},
             "limit": {"type": "integer", "description": "최대 출력 매장 수", "required": False, "default": 20, "min": 1},
@@ -158,6 +187,10 @@ _COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
     "brands list": {
         "command": "tabling brands list",
         "description": "브랜드 목록 조회",
+        "examples": [
+            "tabling brands list",
+            "tabling brands list --page 2 --page-size 20",
+        ],
         "parameters": {
             "page": {"type": "integer", "description": "페이지 번호", "required": False, "default": 1, "min": 1},
             "page_size": {"type": "integer", "description": "페이지 크기", "required": False, "default": 10, "min": 1, "max": 50},
@@ -175,6 +208,10 @@ _COMMAND_SCHEMAS: dict[str, dict[str, Any]] = {
     "status": {
         "command": "tabling status",
         "description": "대기 상태 확인",
+        "examples": [
+            "tabling status W123",
+            "tabling status W123 --fields shop_name,rank,status",
+        ],
         "parameters": {
             "waitlist_id": {"type": "string", "description": "대기열 ID", "required": True},
             "format": {"type": "string", "description": "출력 형식", "required": False, "default": "json", "enum": ["json", "table", "compact"]},
@@ -222,5 +259,19 @@ def list_schemas() -> None:
     output = {
         "commands": _list_commands(),
         "total": len(_COMMAND_SCHEMAS),
+    }
+    print(json.dumps(output, ensure_ascii=False, indent=2))
+
+
+@schema_app.command("all")
+def all_schemas() -> None:
+    """모든 커맨드의 전체 스키마를 한 번에 JSON으로 반환합니다.
+
+    에이전트가 단일 호출로 CLI 전체 기능을 파악할 수 있습니다.
+    """
+    output = {
+        "cli": "tabling-cli",
+        "total": len(_COMMAND_SCHEMAS),
+        "schemas": _COMMAND_SCHEMAS,
     }
     print(json.dumps(output, ensure_ascii=False, indent=2))

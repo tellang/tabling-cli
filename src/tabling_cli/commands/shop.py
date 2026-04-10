@@ -83,6 +83,9 @@ def info(
 
     async def _run() -> dict:
         try:
+            if parsed_params:
+                # 원칙 2: --params 쿼리 파라미터 오버라이드
+                return await client._request("GET", f"/v1/restaurant/{shop_id}", params=parsed_params)
             return await client.get_shop(shop_id)
         finally:
             await client.close()

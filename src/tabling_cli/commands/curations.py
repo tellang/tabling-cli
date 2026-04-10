@@ -75,6 +75,9 @@ def list_curations(
 
     async def _run() -> dict:
         try:
+            if parsed_params:
+                # 원칙 2: --params 쿼리 파라미터 오버라이드
+                return await client._request("GET", "/v1/curations", params=parsed_params)
             return await client.get_curations(home=home)
         finally:
             await client.close()
